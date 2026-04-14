@@ -8,7 +8,7 @@ try:
 except (Exception, AttributeError) as e:
     print(f' - Exception caught: {e}\n')
 
-print('\nNow show that not all functions can be reached')
+print('Now show that not all functions can be reached')
 print('This will raise an exception!')
 
 try:
