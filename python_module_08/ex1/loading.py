@@ -1,8 +1,20 @@
 #! /usr/bin/env python3
-'''
-pip install pandas numpy matplotlib
-'''
+
+import sys
 import importlib
+
+
+def help_env() -> None:
+    print('\nWARNING: Virtual environment not detected!')
+    print('It is recommended to use a virtual environment.\n')
+
+    print('  Option 1: With pip:')
+    print('    python3 -m venv matrix_env')
+    print('    source matrix_env/bin/activate')
+    print('    pip install -r requirements.txt')
+
+    print('\n  Option 2: With Poetry:')
+    print('     poetry install && poetry run python loading.py')
 
 
 def print_version(name_lib: str) -> bool:
@@ -19,20 +31,18 @@ def print_version(name_lib: str) -> bool:
         if mensaje:
             print(f'  - [OK] {name_lib} ({version}) - {mensaje}')
         return True
-    except ModuleNotFoundError:
+    except (ModuleNotFoundError, ImportError, AttributeError, Exception):
         print(f'  *** [KO] {name_lib} - Library not found.')
         return False
 
 
-def check_versions(lib: list[str] | str) -> tuple[bool, list[str]]:
+def check_versions(lib: list[str]) -> tuple[bool, list[str]]:
     result = []
     lib_not_version = []
 
     if isinstance(lib, list):
         for name_lib in lib:
             try:
-                # if not isinstance(name_lib, str):
-                # raise TypeError(f'{name_lib} is not a valid string.')
                 if isinstance(name_lib, str):
                     find_out = print_version(name_lib)
                     result.append(find_out)
@@ -44,12 +54,6 @@ def check_versions(lib: list[str] | str) -> tuple[bool, list[str]]:
             except TypeError as e:
                 print(f'  *!!* [KO] {e}')
 
-    elif isinstance(lib, str):
-        find_out = print_version(lib)
-        result.append(find_out)
-        if not find_out:
-            lib_not_version.append(lib)
-
     else:
         raise TypeError('Argument must be str or list[str].')
 
@@ -57,7 +61,6 @@ def check_versions(lib: list[str] | str) -> tuple[bool, list[str]]:
 
 
 def help_install(lib_not_version: list[str]) -> None:
-    libs = ' '.join(lib_not_version)
     print('\nTo install missing dependencies:')
     print('\n  With pip:')
     for lib in lib_not_version:
@@ -67,23 +70,21 @@ def help_install(lib_not_version: list[str]) -> None:
         print(f'    poetry add {lib}')
 
 
-def start_program():
+def start_program() -> None:
     import pandas as pd
     import numpy as np
-    import requests as rq
     import matplotlib.pyplot as mplt
 
-    print("Analyzing Matrix data...")
+    print("\nAnalyzing Matrix data...")
     data = np.random.randint(0, 100, 1000)
 
     print("Processing 1000 data points...")
     df = pd.DataFrame(data, columns=["values"])
     print(df.describe())
 
-    # matplotlib
-    print("Generating visualization...")
+    print("Generating visualization...\n")
     # mplt.hist(df["values"], bins=20) #barras
-    mplt.hist(df["values"]) #lineal
+    mplt.plot(sorted(df["values"]))  # lineal
     mplt.title("Matrix Data Analysis")
     mplt.savefig("matrix_analysis.png")
     print("Analysis complete!")
@@ -91,16 +92,20 @@ def start_program():
 
 
 if __name__ == '__main__':
-    lib = ['pandas', 'numpy', 'requests', 'matplotlib', 444]
+    lib = ['pandas', 'numpy', 'matplotlib']
+
+    in_venv = sys.prefix != sys.base_prefix
 
     print('\nLOADING STATUS: Loading programs...\n')
-    print('Checking dependencies:')
-    ok, lib_not_version = check_versions(lib)
-    if ok:
-        print('All dependencies OK. Starting program...')
-        start_program()
+    if not in_venv:
+        help_env()
     else:
-        print('\nMissing dependencies. Aborting.')
-        if lib_not_version:
-            help_install(lib_not_version)
-        # exit(1)
+        print('Checking dependencies:')
+        ok, lib_not_version = check_versions(lib)
+        if ok:
+            print('All dependencies OK. Starting program...')
+            start_program()
+        else:
+            print('\nMissing dependencies. Aborting.')
+            if lib_not_version:
+                help_install(lib_not_version)
