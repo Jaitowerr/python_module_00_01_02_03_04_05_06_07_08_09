@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field, ValidationError, model_validator
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Type
+from typing import Optional, Type, Any
 
 
 class ContactType(Enum):
@@ -29,21 +29,22 @@ class AlienContact(BaseModel):
     def validate_rules(self) -> 'AlienContact':
         errors = []
         if not self.contact_id.startswith('AC'):
-            errors.append('Contact ID must start with AC')
+            errors.append(' ⚠  Contact ID must start with AC')
         if self.contact_type == ContactType.physical and not self.is_verified:
-             errors.append('Physical contact reports must be verified')
-        elif self.contact_type == ContactType.telepathic and self.witness_count < 3:
-             errors.append(
-                'Telepathic contact requires at least 3 witnesses')
+            errors.append(' ⚠  Physical contact reports must be verified')
+        elif (self.contact_type == ContactType.telepathic
+              and self.witness_count < 3):
+            errors.append(
+                ' ⚠  Telepathic contact requires at least 3 witnesses')
         if self.signal_strength > 7.0 and not self.message_received:
-             errors.append(
-                'Strong signals should include received messages')
+            errors.append(
+                ' ⚠  Strong signals should include received messages')
         if errors:
-			raise ValueError(errors)
-		return self
+            raise ValueError('\n'.join(errors))
+        return self
 
 
-def main(object_space: Type[AlienContact], values: dict):
+def main(object_space: Type[AlienContact], values: dict[str, Any]) -> None:
     try:
         alien = object_space(**values)
         print('\n', 60 * '=')
@@ -57,10 +58,11 @@ def main(object_space: Type[AlienContact], values: dict):
         print(f'  Message: {alien.message_received}')
 
     except ValidationError as e:
+        id = values.get('contact_id', 'Unknown id contact')
         print('\n', 60 * '=')
-        print('Expected validation error:')
+        print(f'Expected validation error for {id}')
         for error in e.errors():
-            print(error['msg'])
+            print(error['msg'].replace('Value error, ', ''))
 
 
 if __name__ == '__main__':
@@ -90,3 +92,16 @@ if __name__ == '__main__':
         'is_verified': False
     }
     main(AlienContact, value_invalid)
+
+    value_invalid2 = {
+        'contact_id': 'XX001',
+        'timestamp': '2024-01-15T11:00:00',
+        'location': 'Roswell, New Mexico',
+        'contact_type': ContactType.physical,
+        'signal_strength': 9.0,
+        'duration_minutes': 30,
+        'witness_count': 1,
+        'is_verified': False
+    }
+
+    main(AlienContact, value_invalid2)

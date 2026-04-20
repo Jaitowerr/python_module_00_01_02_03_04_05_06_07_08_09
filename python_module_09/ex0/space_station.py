@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, ValidationError
 from datetime import datetime
-from typing import Optional, Type
+from typing import Optional, Type, Any
 
 
 class SpaceStation(BaseModel):
@@ -17,7 +17,7 @@ class SpaceStation(BaseModel):
     notes: Optional[str] = Field(default=None, max_length=200)
 
 
-def main(object_space: Type[SpaceStation], values: dict) -> None:
+def main(object_space: Type[SpaceStation], values: dict[str, Any]) -> None:
     try:
 
         station = object_space(**values)
@@ -33,10 +33,10 @@ def main(object_space: Type[SpaceStation], values: dict) -> None:
         status = 'Operational' if station.is_operational else 'Offline'
         print(f'  Status: {status}')
     except ValidationError as e:
-        print(
-            '\n',
-            60 * '=')
-        print('Expected validation error:')
+        name = values.get('name', 'Unknown Name Statio')
+        id = values.get('station_id', 'Unknown id station')
+        print('\n', 60 * '=')
+        print(f'Expected validation error for {name} ({id})')
         for error in e.errors():
             print(error['msg'])
 

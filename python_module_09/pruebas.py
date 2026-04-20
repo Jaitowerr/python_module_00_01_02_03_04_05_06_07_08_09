@@ -7,6 +7,8 @@
 # Cuando creas un objeto, valida tipos y restricciones automáticamente.
 # =============================================================================
 
+import json
+from datetime import datetime as dt
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, ValidationError
@@ -27,6 +29,7 @@ from pydantic import BaseModel, Field, ValidationError
 class EstacionSimple(BaseModel):
     nombre: str
     tripulacion: int
+
 
 print()
 print()
@@ -58,8 +61,10 @@ print("2. COERCIÓN DE TIPOS")
 print("=" * 60)
 
 estacion_coercion = EstacionSimple(nombre="Mir", tripulacion="3")
-print("tripulacion='3' (str) se convierte a int: ", estacion_coercion.tripulacion)
-print("Tipo resultado:                            ", type(estacion_coercion.tripulacion))
+print("tripulacion='3' (str) se convierte a int: ",
+      estacion_coercion.tripulacion)
+print("Tipo resultado:                            ",
+      type(estacion_coercion.tripulacion))
 
 
 # =============================================================================
@@ -117,6 +122,7 @@ class EstacionConField(BaseModel):
     nivel_energia: float = Field(..., ge=0.0, le=100.0)
     es_operacional: bool = True
     notas: Optional[str] = Field(default=None, max_length=200)
+
 
 print()
 print()
@@ -201,7 +207,6 @@ print("String → envento1 → datetime:  ", evento1.fecha)
 print("Tipo → envento1:      ", type(evento1.fecha))
 
 # Desde objeto datetime
-from datetime import datetime as dt
 evento2 = EventoEspacial(nombre="Aterrizaje", fecha=dt(2024, 6, 1, 8, 0, 0))
 print("datetime → evento2 → datetime:", evento2.fecha)
 
@@ -240,6 +245,5 @@ print("=" * 60)
 print("7. model_json_schema()")
 print("=" * 60)
 
-import json
 schema = EstacionConField.model_json_schema()
 print(json.dumps(schema, indent=2))
