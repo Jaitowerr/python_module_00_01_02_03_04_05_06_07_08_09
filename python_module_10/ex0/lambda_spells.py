@@ -51,7 +51,6 @@ if __name__ == '__main__':
     print('Testing filter sorter...')
     min_pwr_mg = len(mages) - 1
     mages = artifact_sorter(mages)
-    # filtered = power_filter(mages, mages[-1]['power'])
     filtered = power_filter(mages, 50)
     print(' -', filtered)
 

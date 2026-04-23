@@ -49,8 +49,8 @@ if __name__ == '__main__':
     print(f'counter_a call 1: {counter_a()}')
     print(f'counter_a call 2: {counter_a()}')
     print(f'counter_b call 1: {counter_b()}')
-    print(f'counter_b call 1: {counter_b()}')
-    print(f'counter_a call 1: {counter_a()}\n')
+    print(f'counter_b call 2: {counter_b()}')
+    print(f'counter_a call 3: {counter_a()}\n')
 
     print('\n===== TEST SPELL_ACCUMULATOR =====')
     accumulator = spell_accumulator(100)
